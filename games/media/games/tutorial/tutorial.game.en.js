@@ -15,6 +15,9 @@ undum.game.id = "be1c95b9-cbc7-48c6-8e6a-89837aa9113e";
  * prevents Undum from trying to load the saved-game and crashing. */
 undum.game.version = "1.0";
 
+// En modo depuraciÃ³n, que no haya efectos de jquery
+jQuery.fx.off=false
+
 /* A variable that changes the fade out speed of the option text on
  * a mobile. */
 undum.game.mobileHide = 2000
@@ -28,441 +31,253 @@ undum.game.slideUpSpeed = 500
 
 /* The situations that the game can be in. Each has a unique ID. */
 undum.game.situations = {
-    start: new undum.SimpleSituation(
-        "<h1>Starting Out with Undum</h1>\
-        <img src='media/games/tutorial/woodcut1.png' class='float_right'>\
-        <p>Welcome to the Undum tutorial. Undum is a tool for writing\
-        hypertext interactive fiction. It has some unique features\
-        and a visual design that encourages narrative games.</p>\
-        \
-        <p>Hypertext interactive fiction is the digital equivalent of the\
-        Choose Your Own Adventure (CYOA) books that were popular in the\
-        1980s. The story is told in chunks, and you select from a range\
-        of options to move it forward. Unlike the book form, however, the\
-        digital form gives you far more flexibility to tell rich stories\
-        and introduce more interesting game elements.</p>\
-        \
-        <p class='transient'>Click <a href='hub'>this link to\
-        continue...</a></p>"
+    inicio: new undum.SimpleSituation(
+        "<h1>La odisea de la baguette comienza</h1>\
+		<h1> El salón </h1>\
+        <p>Es un lunes cualquiera. Son las 13:15 y estás en pijama en el salón de tu casa haciendo\
+		el proyecto de Desarrollo Ágil que tienes que entregar esta noche y que acabas de empezar\
+        cuando de repente suena el teléfono.\
+        ¿Lo <a href='cogerlo'> cogerás </a> o <a href='nocogerlo'> dejaras que suene</a>?</p>"
     ),
+    nocogerlo: new undum.SimpleSituation(
+        "<p class='transient'>Dejas que suene mientras sigues con tu proyecto individual sobre ir a comprar.\
+        A las 14:00 más o menos tus padres llegan a casa y te preguntan si has comprado pan.</p>\
+		<p class='transient'>Acabaras el proyecto a tiempo pero has tenido que pagar un gran precio. Vas a tener que comer sin pan.</p>\
+		<p class='transient'><a href='inicio'> Volver a intentarlo </a></p>"
+		
+    ),
+    cogerlo: new undum.SimpleSituation(
+        "<p>Coges el teléfono y ves que te está llamando tu madre.</p>\
+        <p class='dialogo'>-¿Estás ocupado?</p>\
+		<p class='dialogo'>+Pues sí, estoy en mitad de un proyecto de Desarrollo Ágil\
+		haciendo unas tarjetas en Trello.</p>\
+		<p class='dialogo'>-¿Tre qué? Bueno, baja un momento a la panadería de aquí al lado y compra una baguette \
+		que a tu padre y a mi se nos ha pasado y para cuando salgamos de trabajar ya no quedaran.</p>\
+        \
+        <p>Viendo que bajar no es negociable sales raudo y veloz hacia tu habitación para cambiarte y\
+		llevar a cabo el recado cuanto antes y poder continuar tu proyecto.</p>",
+		{
+			enter:function(character, system, from) {
+					system.doLink('habitacion');
+			}
+		}
 
-    // NB: The 'hub' situation which is the main list of topics, is
-    // defined wholly in the HTML file, and doesn't have an entry in
-    // the game.situations dictionary in this file.
-
-    // For variety, here we define a situation using the top-level
-    // Situation type. This is a neat approach to generate text by
-    // looking it up in the HTML document. For static text that makes
-    // more sense than writing it longhand.
-    situations: new undum.Situation({
-        enter: function(character, system, from) {
-            system.write($("#s_situations").html());
-        },
-        tags: ["topic"],
-        optionText: "What Undum Games are Made Of",
-        displayOrder: 1
-    }),
-    todo: new undum.SimpleSituation(
-        "<p>Two things can happen in a situation. The character either\
-        <a href='links'>leaves</a> the situation and enters another one, or\
-        they carry out some <a href='./do-something'>action</a>. Actions may\
-        perform some processing, they may display some results, but\
-        ultimately they put the character back into the same situation\
-        again.</p>\
-        \
-        <p>When you are designing your game, use situations to reflect a\
-        change in what the character can do. So you would change situation if\
-        the character pulls a lever to open a trapdoor, for example. Actions\
-        are intended for situations where the character can examine things\
-        more closely, or maybe top up their magic by drinking a potion.\
-        Things that don't affect the state of the world around them.</p>\
-        \
-        <p>Situations generate content when they are <em>enter</em>ed,\
-        <em>exit</em>ed, and when they receive an <em>act</em>ion (the\
-        italicised words are the names of the three methods that do this).\
-        You can write code to generate content in any way you like, so the\
-        content that is displayed can be totally dynamic: taking into\
-        account the current state of the character.\
-        Content is just plain HTML, so you use regular HTML tags to make\
-        things <strong>bold</strong> or <em>italic</em>, or to include\
-        images. This gives you a lot of flexibility. For example, since Undum\
-        targets HTML5 browsers, you could use the <em>audio</em> or\
-        <em>video</em> tags to include rich media.</p>\
-        \
-        <p class='transient'>Make sure you've carried out the action above,\
-        then <a href='hub'>return to the topic list</a>.</p>",
-        {
-            actions: {
-                'do-something': "<p>You carried out the action, well done.\
-                                 You'll notice that the links for this\
-                                 situation are still active. This means you\
-                                 can click to perform the action again.</p>"
-            }
-        }
     ),
-    links: new undum.SimpleSituation(
-        "<p>Between each chunk of new text, Undum inserts a discreet line\
-        in the margin. This allows you to see at a glance everything that\
-        has been output as a result of your last click.\
-        It is particularly useful for small devices, or when\
-        lots of content has appeared. The window also scrolls so the start\
-        of the new content is as near to the top of the window as possible.\
-        This is also designed to help you read more naturally.</p>\
-        \
-        <p>If you've been watching carefully, you will have noticed that\
-        parts of the text have been disappearing when you move between\
-        situations. This isn't a bug! One of the aims of Undum is to give\
-        game designers the ability to make the transcript of\
-        the game read as a coherent piece of narrative. However, you often\
-        need chunks of text that do nothing but offer the reader choices.\
-        Undum defines a special CSS class to add to your HTML for this\
-        (remember generated content is just HTML). It is <em>transient</em>,\
-        and can be applied to paragraphs, <em>div</em>s, or just\
-        <em>span</em>s<span class='transient'> (such as this one)</span>.</p>\
-        \
-        <p>You may also have noticed that, when you move situations, all the\
-        links in the previous situation turn into regular text. This is to\
-        stop you backtracking and trying previous options when you've already\
-        committed to one. In other H-IF systems, this is\
-        done by completely removing the content from previous pages.\
-        That prevents you going back and reading your story, however.</p>\
-        \
-        <p class='transient'>The 'Different Kinds of Links' topic has more\
-        about these links.\
-        Let's return to the <a href='hub'>topic list</a>.</p>",
-        {
-            heading: "Disappearing Content",
-            diplayOrder: 2,
-            tags: ["topic"]
-        }
+	
+	habitacion: new undum.SimpleSituation(
+		"<h1>Tu habitación</h1>\
+	    <p>Estás en tu habitación, sobre el escritorio ves <a href='./cogercarteraymascarilla' class='once'>tu cartera, una mascarilla</a> y tus llaves al lado de la hoja donde has escrito las\
+		situaciones de tu proyecto.</p>",
+			{
+				actions:{
+					'cogercarteraymascarilla': function( character, system, action){
+						system.setQuality( "dinero", 10 );
+						system.setQuality( "mascarilla", true);
+						system.write("<p>Ahora tienes 10€ y la mascarilla puesta</p>")
+						system.write("<p>Ya estas listo para salir a <a href='salircalle'>la calle</a></p>")
+					}
+				}
+			}
     ),
-    sticky: new undum.SimpleSituation(
-        "<p>There are three types of link in Undum. The first two we've seen\
-        in previous topics:\
-        links to change situation and links to carry out an action. When you\
-        include a link in your output, Undum parses it and wires it up\
-        correctly. If you create a link with a HTML <em>href</em> attribute\
-        containing just a name ('ballroom', for\
-        example) this will send the character to the situation with that\
-        name. Links\
-        with two components ('ballroom/view-painting', for example) send\
-        the character to a new situation <em>and then</em> carry out the\
-        named action ('view-painting' in this case). To carry out an action\
-        in the current situation, you can replace the situation name with a\
-        dot (so it would be './view-painting'). In all cases, if the\
-        character is already in that situation, then the situation's\
-        <em>enter</em> method won't be called again.</p>\
-        \
-        <img src='media/games/tutorial/woodcut2.png' class='float_left'>\
-        <p>The third type of link, then, is a general hyperlink. If your\
-        link doesn't consist of a single element or pair of elements, as\
-        above, then Undum will guess that you have a normal hyperlink. As\
-        <a href='http://news.bbc.co.uk' class='sticky'>in this link</a>.\
-        If you have a link that <em>does</em> look like an Undum link, you\
-        can still force Undum not to interpret it as an action or situation\
-        move, by adding the CSS class <em>raw</em> to the HTML <em>a</em> tag.\
-        links that don't have the <em>raw</em> class, but that are considered\
-        to be non-Undum links (like the link above), will have <em>raw</em>\
-        added to them before display. This could allow you to style external\
-        links differently, as we have done here.</p>\
-        \
-        <p>In the last situation I said you can prevent links from being\
-        turned into regular text when you move situations. This is done\
-        by another CSS class: <em>sticky</em>. When you\
-        <a href='oneshot'>leave this situation</a>, you'll notice the\
-        external link stays active. This can allow you to have options that\
-        stay valid throughout the narrative, for example, such as a spell to\
-        teleport home.</p>",
-        {
-            tags: ["topic"],
-            displayOrder: 3,
-            heading: "Different Kinds of Links"
-        }
+    salircalle: new undum.SimpleSituation(
+        "<h1>La calle</h1>\
+		<p>Sales a la calle, ¿qué haces?:</p>\
+		<p class='transient'><a href='panaderiaesquina'>1)Ir a la panadería de la esquina</p>\
+		<p class='transient'><a href='supermercado'>2)Ir al supermercado</p>"
     ),
-    oneshot: new undum.SimpleSituation(
-        "<p>There is one final option for links. If you give a link\
-        the <em>once</em> CSS class, then that link will disappear\
-        after it is clicked. This is  used (as in\
-        <a href='./one-time-action' class='once'>this link</a>) for\
-        actions that you only want to be possible once. There is no\
-        point using 'once' on situation links because they'll be turned\
-        into text as soon as you click them anyway (unless they are also\
-        <em>sticky</em>, of course).</p><p>Once links are useful\
-        for actions such as examining an object more carefully. You\
-        don't want lots of repeated descriptions, so making the link\
-        a <em>once</em> link is more user friendly.</p>\
-        <p>If you have more than one link to the same action, then all\
-        matching links will be removed, so you don't have to worry about\
-        the player having an alternative way to carry out the action.</p>\
-        <p class='transient'>After you've clicked the link, let's\
-        <a href='hub'>move on</a>.</p>",
-        {
-            actions: {
-                "one-time-action": "<p>As I said, one time actions are\
-                                   mostly used to describe something in\
-                                   more detail, where you don't want the\
-                                   same descriptive text repeated over and\
-                                   over</p>"
-            }
-        }
+	salircalleintento: new undum.SimpleSituation(
+        "<h1>La calle</h1>\
+		<p>Sales a la calle, ¿qué haces?:</p>\
+		<p class='transient'><a href='supermercado'>1)Ir al supermercado</p>\
+		<p class='transient'><a href='casanobaguette'>2)Volver a casa</a></p>"
     ),
-    qualities: new undum.SimpleSituation(
-        "<p>Let's talk about the character.\
-        The character is described by a series of <em>qualities</em>. These\
-        are numeric values that can describe anything from natural abilities\
-        to how much of a resource the character controls. Qualities are\
-        shown in the box on the right of the text.</p>\
-        \
-        <p>The qualities there are those you started the game with. When you\
-        <a href='quality-types'>go to the next situation</a>, keep your\
-        eyes on the character panel. You'll notice I'll give you a boost to\
-        your stamina quality. This process is animated and highlighted to\
-        draw your attention to it. You could also get a boost of skill\
-        by carrying out <a href='./skill-boost'>this action</a> as many\
-        times as you like.</p>",
-        {
-            heading: "Qualities and the Character",
-            tags: ["topic"],
-            displayOrder: 4,
-            actions: {
-                "skill-boost": function(character, system, action) {
-                    system.setQuality("skill", character.qualities.skill+1);
-                }
-            },
-            exit: function(character, system, to) {
-                system.setQuality("stamina", character.qualities.stamina+1);
-            }
-        }
+    panaderiaesquina: new undum.SimpleSituation(
+        "<h1>La panadería de la esquina</h1>\
+		<p>Entras en la panadería y ves que está abarrotada de gente </p>,\
+		<p class='transient'>¿<a href='esperar1'>Esperas tu turno</a> o <a href='./salir1'> te vas</a>?</p>\
+        ",
+		{
+			actions:{
+				'salir1': function (character, system, action){
+					system.doLink('salircalleintento');
+				}
+			}
+		}
     ),
-    "quality-types": new undum.SimpleSituation(
-        "<p>Not all the qualities in the character panel are displayed as\
-        numeric. Internally they are all numeric, but different qualities\
-        get to choose how to display themselves. So 'Luck', for example, is\
-        displayed as words (based on the FUDGE RPG's adjective scale),\
-        and 'Novice' is using just a check-mark.</p>\
-        \
-        <p>To see how Luck changes, try using this\
-        <a href='./luck-boost'>luck-boosting action</a> or this\
-        <a href='./luck-reduce'>luck-reducing action</a>. Notice that\
-        luck uses a numeric bonus when it runs out of words. There are a range\
-        of different display types provided with Undum, and you can easily\
-        add your own too.</p>\
-        \
-        <p>When you <a href='character-text'>leave this situation</a>,\
-        I'll set 'Novice' to zero. Watch\
-        the character panel, and you'll see that Novice decides it doesn't\
-        need to be displayed any more and will be removed. You will also see\
-        that when the last\
-        quality in a group is removed ('Novice' is in the 'Progress' group),\
-        then the group heading is also removed. You can tell Undum what\
-        group each quality belongs to, and what order they should be listed.\
-        <p>",
-        {
-            actions: {
-                "luck-boost": function(character, system, action) {
-                    system.setQuality("luck", character.qualities.luck+1);
-                },
-                "luck-reduce": function(character, system, action) {
-                    system.setQuality("luck", character.qualities.luck-1);
-                }
-            },
-            exit: function(character, system, to) {
-                system.setQuality("novice", 0);
-            }
-        }
+    esperar1: new undum.SimpleSituation(
+        "<p>Sigues esperando en la panadería y ves como cada vez hay menos baguettes </p>,\
+		<p class='transient'>¿<a href='esperar2'>Esperas tu turno</a> o <a href='./salir2'> te vas</a>?</p>\
+        ",
+		{
+			actions:{
+				'salir2': function (character, system, action){
+					system.doLink('salircalleintento');
+				}
+			}
+		}
     ),
-    "character-text": new undum.SimpleSituation(
-        "<h1>Character Text</h1>\
-        <p>Above the list of qualities is a short piece of text, called\
-        the character-text. This describes the character in some way. It\
-        can be set by any action or when entering or leaving a situation.\
-        It is just regular HTML content, as for all text in Undum. It can\
-        also contain Undum links, so this is another place you can put\
-        actions that the character can carry out over a long period of time.\
-        </p>\
-        <p class='transient'>Let's go back to the\
-        <a href='hub'>topic list</a>. As you do, I'll change the\
-        character text. Notice that it is highlighted, just the same as\
-        when a quality is altered.</p>",
-        {
-            exit: function(character, system, to) {
-                system.setCharacterText(
-                    "<p>We're nearing the end of the road.</p>"
-                );
-            }
-        }
+	esperar2: new undum.SimpleSituation(
+        "<p>Sigues esperando en la panadería y ves que quedan muy pocas baguettes </p>,\
+		<p class='transient'>¿<a href='esperar3'>Esperas tu turno</a> o <a href='./salir3'> te vas</a>?</p>\
+        ",
+		{
+			actions:{
+				'salir3': function (character, system, action){
+					system.doLink('salircalleintento');
+				}
+			}
+		}
     ),
-    progress: new undum.SimpleSituation(
-        "<p>Sometimes you want to make the change in a quality into a more\
-        significant event. You can do this by animating the change in\
-        quality. If you <a href='./boost-stamina-action'>boost your\
-        stamina</a>, you will see the stamina change in the normal\
-        way in the character panel. But you will also see a progress\
-        bar appear and animate below.</p>",
-        {
-            tags: ["topic"],
-            heading: "Showing a Progress Bar",
-            displayOrder: 5,
-            actions: {
-                // I'm going indirect here - the link carries out an
-                // action, which then uses doLink to directly change
-                // the situation.  This isn't the recommended way (I
-                // could have just changed situation in the link), but
-                // it illustrates the use of doLink.
-                "boost-stamina-action": function(character, system, action) {
-                    system.doLink("boost-stamina");
-                }
-            },
-            exit: function(character, system, to) {
-                system.animateQuality(
-                    'stamina', character.qualities.stamina+1
-                );
-            }
-        }
+	esperar3: new undum.SimpleSituation(
+        "<p>La persona que está delante de ti se lleva la última baguette así que <a href='salircalleintento'> te vas decepcionado</a>.</p>"
     ),
-    "boost-stamina": new undum.SimpleSituation(
-        "<p>\
-        <img src='media/games/tutorial/woodcut3.png' class='float_right'>\
-        The progress bar is also useful in situations where the\
-        character block is displaying just the whole number of a quality,\
-        whereas some action changes a fraction. If the quality is displaying\
-        the character's level, for example, you might want to show a progress\
-        bar to indicate how near the character is to levelling up.</p>\
-        \
-        <p>After a few seconds, the progress bar disappears, to keep the\
-        focus on the text. Undum isn't designed for games where a lot of\
-        statistic management is needed. If you want a change to be part\
-        of the permanent record of the game, then write it in text.</p>\
-        \
-        <p>Let's <a href='hub'>return to the topic list.</a></p>"
-        ),
-    // Again, we'll retrieve the text we want from the HTML file.
-    "saving": new undum.Situation({
-        enter: function(character, system, from) {
-            system.write($("#s_saving").html());
-        },
-        tags: ["topic"],
-        displayOrder: 6,
-        optionText: "Saving and Loading"
-    }),
-
-    "implicit-boost": new undum.SimpleSituation(
-        "<p>Your luck has been boosted<span class='transient'>, check the\
-        list of options to see if they have changed</span>.</p>",
-        {
-            tags: ["example"],
-            enter: function(character, system, from) {
-                system.animateQuality("luck", character.qualities.luck+1)
-                system.doLink('example-choices');
-            },
-            optionText: "Boost Your Luck",
-            displayOrder: 1,
-            canView: function(character, system, host) {
-                return character.qualities.luck < 4;
-            }
-        }
-    ),
-    "implicit-drop": new undum.SimpleSituation(
-        "<p>Your luck has been reduced<span class='transient'>, check the\
-        list of options to see if they have changed</span>.</p>",
-        {
-            tags: ["example"],
-            enter: function(character, system, from) {
-                system.animateQuality("luck", character.qualities.luck-1)
-                system.doLink('example-choices');
-            },
-            optionText: "Reduce Your Luck",
-            displayOrder: 2,
-            canView: function(character, system, host) {
-                return character.qualities.luck > -4;
-            }
-        }
-    ),
-    "high-luck-only": new undum.SimpleSituation(
-        "<p>Your luck is higher than 'fair'. The link to this \
-        situation would not\
-        have appeared if it were lower.</p>",
-        {
-            tags: ["example"],
-            enter: function(character, system, from) {
-                system.doLink('example-choices');
-            },
-            optionText: "High Luck Option",
-            displayOrder: 3,
-            canView: function(character, system, host) {
-                return character.qualities.luck > 0;
-            }
-        }
-    ),
-    "low-luck-only": new undum.SimpleSituation(
-        "<p>Your luck is lower than 'fair'. The link to this situation \
-        appears whether\
-        it is low or high, but can only be chosen if it is low. It does this\
-        by defining a <em>canChoose</em> method.</p>",
-        {
-            tags: ["example"],
-            enter: function(character, system, from) {
-                system.doLink('example-choices');
-            },
-            optionText: "Low Luck Option (requires low luck to be clickable)",
-            displayOrder: 3,
-            canChoose: function(character, system, host) {
-                return character.qualities.luck < 0;
-            }
-        }
-    ),
-
-    "last": new undum.SimpleSituation(
-        "<h1>Where to Go Now</h1>\
-        <p>So that's it. We've covered all of Undum. This situation is the\
-        end, because it has no further links. The 'The End' message is\
-        just in the HTML output of this situation, it isn't anything special\
-        to Undum</p>\
-        \
-        <p>I've added an\
-        inspiration quality to your character list. Its time for you to\
-        crack open the game file and write your own story.</p>\
-        <h1>The End</h1>",
-        {
-            tags: ["topic"],
-            optionText: "Finish the Tutorial",
-            displayOrder: 8,
-            enter: function(character, system, from) {
-                system.setQuality("inspiration", 1);
-                system.setCharacterText(
-                    "<p>You feel all inspired, why not have a go?</p>"
-                );
-            }
-        }
-    )
+	supermercado: new undum.SimpleSituation(
+		"<h1>El supermercado</h1>\
+		<p>Entras al supermercado y miras hacia arriba para ver en que pasillo esta el pan.<p>\
+		<p>Cuando alzas la vista ves que no están los carteles que indican lo que hay en cada pasillo</p>\
+		<p> Por suerte, este supermercado solo tiene 3 pasillos así que no deberías tardar mucho en encontrarlo.</p>\
+		",
+		{
+			enter:function(character, system, from) {
+					system.doLink('selecpasillo');
+			}
+		}
+	),
+	selecpasillo: new undum.SimpleSituation(
+	"<p class='transient'> Hay 3 pasillos: uno a la <a href='pizquierda'>izquierda</a>, uno en el <a href='pcentro'>centro</a> y \
+		otro a la <a href='pderecha'>derecha</a>.</p>"
+	),
+	pizquierda: new undum.SimpleSituation(
+		"<p>Vas al pasillo de la izquierda</p>\
+		<p>Ves la seccion de especias y salsas</p>\
+		<p>Aquí no está la sección del pan.</p>\
+		<br>\
+		<p class='transient'><a href='selecpasillo'> Volver</a></p>\
+		"
+	),
+	pcentro: new undum.SimpleSituation(
+		"<p>Vas al pasillo del centro</p>\
+		<p>Ves la sección bebidas azucaradas y energéticas</p>\
+		<p>Entre las bebidas energéticas ves la bebida del momento, <a href='./cogermonstro'>Mostro™</a>, la bebida con la que tendrás tanta energía que no podrás cerrar los ojos ni aunque quieras</p>\
+		<p>Aquí no está la sección del pan.</p>\
+		<br>\
+		<p class='transient'><a href='selecpasillo'> Volver.</a></p>",
+		{
+			actions:{
+				'cogermonstro': function(character,system,action){
+				system.write("<p>Has cogido un Mostro™</p>");
+				system.setQuality("bebidaEner",true);
+				system.setQuality("dinero",(character.qualities.dinero-1));
+				}
+			}
+		}
+	),
+	pderecha: new undum.SimpleSituation(
+		"<p>Vas al pasillo de la derecha</p>\
+		<p>Ves la sección de panadería y ves la <a href='./cogerbaguette'>baguette</a> que tanto has buscado</p>\
+		",
+		{
+			actions:{
+				'cogerbaguette': function(character,system,action){
+				system.write("<p>Por fin, la baguette es tuya</p>");
+				system.setQuality("baguette",true);
+				system.write("<p class='transient'><a href='casa'>Volver a casa</a></p>");
+				system.setQuality("dinero",(character.qualities.dinero-1));
+				}
+			}
+		}
+	),
+	casa: new undum.SimpleSituation(
+		"<p>Vuelves a casa con tu flamante baguette y comes con tus padres.</p>",
+		{
+			enter:function( character, system, from ) {
+						if( character.qualities.bebidaEner ) {
+							system.doLink( 'finmostro');
+						} else {
+							system.doLink( 'finnomostro');
+						}
+			}
+		}
+	),
+	finnomostro: new undum.SimpleSituation(
+	"<p>Una vez que has acabado de comer, sigues con la proyecto de Desarrollo Ágil y lo acabas justo 5 minutos antes del tiempo límite</p>\
+	<p>Esta vez has tenido suerte</p>\
+	<h1>¡Fin!</h1>"
+	),
+	finmostro: new undum.SimpleSituation(
+	"<p>Una vez que has acabado de comer, te dispones a seguir con el proyecto de Desarrollo Ágil pero antes decides darle un sorbo \
+	a la bebida energética que has comprado y te pones a trabajar.</p>\
+	<p>Te despiertas al día siguiente y miras tu ordenador para ver que ha pasado.</p>\
+	<p>Al parecer durante el tiempo que no recuerdas has hecho todos las prácticas y \
+	has contestado correctamente a todas las posibles preguntas de todas las asignaturas del grado \
+	y de todos los posibles másteres relacionados con la carrera, así que, has completado el grado \
+	y todos los másteres en 1 día.</p>\
+	<p>En tu estado de euforia tras este giro de los acontecimiento intentas desbloquear el \
+	teléfono para contárselo a tus compañeros de carrera y ves que no puedes</p>\
+	<p>Al parecer te has quedado sin huellas dactilares al teclear tanto en un día<\p>\
+	<h1>¡Fin!</h1>"
+	),
+	casanobaguette: new undum.SimpleSituation(
+	"<p>Te vuelves a casa triste por no haber podido comprar la baguette.</p>\
+	<p>Al entrar por la puerta escuchas un documental de la 2 sobre ritos de invocación de las tribus antiguas</p>\
+	<p class='dialogo'>... para sus ritos de invocación pronunciaban los nombres de los dioses, sobre todo, los de los relacionados con lo que desearan invocar.</p>\
+	<p>No pierdo nada por probar.</p>\
+	<p>Te acercas a la mesa y te inclinas hacia ella</p>\
+	<p id='invo' class='dialogo'>Baguette, yo te invoco por el poder que me conceden los dioses de Bimbo.</p>",
+	{
+		enter: function( character, system, from ) {
+					if( system.rnd.random()>0.5 ) {
+						system.write("<p>¡Ha aparecido una baguette!</p>",'invo' );
+						system.doLink('fininvocacion');
+					} else {
+						system.write( "<p>A pesar de tu intento no has tenido éxito.</p>",'invo');
+						system.doLink('finnoinvocacion');
+					}
+				}
+	}
+	),
+	fininvocacion: new undum.SimpleSituation(
+			"<p>Justo cuando aparece en la mesa tus padres abren la puerta</p>\
+			<p class='dialogo'>-Que bien, has podido comprar una, pensaba que a estas horas no quedarían. </p>\
+			<p class='dialogo'>+Sí, la he &quot comprado &quot.</p>\
+			<p>Los años de decirle a los profesores que llevas bien la práctica cuando todavía no la has llegado a empezar han dado su fruto y tus padres te creen.</p>\
+			<p>Cuando acabas de comer piensas probar suerte a ver si te aparece el proyecto hecho invocando a los dioses de Undum pero no quieres tentar a la suerte y continuas con el proyecto acabándolo un par de minutos antes de la hora límite.</p>\
+			<h1>¡Fin!</h1>"
+			
+	),
+	finnoinvocacion: new undum.SimpleSituation(
+			"<p>Justo en ese momento miras la puerta y ves a tus padres preguntándose que han hecho mal para que hayas intentado invocar una baguette</p>\
+			<p>Coméis el silencio pero de vez en cuando ves como se le escapa alguna risa a tus padres.</p>\
+			<p>Cuando acabas de comer continúas con el proyecto y lo acabas 5 minutos antes de la hora límite, así que por lo menos eso sí que te ha salido bien.</p>\
+			<h1>¡Fin!</h1>"
+			
+	)
 };
 
 // ---------------------------------------------------------------------------
 /* The Id of the starting situation. */
-undum.game.start = "start";
+undum.game.start = "inicio";
 
 // ---------------------------------------------------------------------------
 /* Here we define all the qualities that our characters could
  * possess. We don't have to be exhaustive, but if we miss one out then
  * that quality will never show up in the character bar in the UI. */
 undum.game.qualities = {
-    skill: new undum.IntegerQuality(
-        "Skill", {priority:"0001", group:'stats'}
+	mascarilla: new undum.OnOffQuality(
+		"Mascarilla", {priority:"0001", group:'oculto'}
+	),
+    dinero: new undum.NumericQuality(
+        "Dinero", {priority:"0001", group:'bolsillo'}
     ),
-    stamina: new undum.NumericQuality(
-        "Stamina", {priority:"0002", group:'stats'}
+    llaves: new undum.OnOffQuality(
+        "Llaves de casa", {priority:"0002", group:'bolsillo'}
     ),
-    luck: new undum.FudgeAdjectivesQuality( // Fudge as in the FUDGE RPG
-        "<span title='Skill, Stamina and Luck are reverently borrowed from the Fighting Fantasy series of gamebooks. The words representing Luck are from the FUDGE RPG. This tooltip is illustrating that you can use any HTML in the label for a quality (in this case a span containing a title attribute).'>Luck</span>",
-        {priority:"0003", group:'stats'}
+    baguette: new undum.OnOffQuality(
+        "Baguette", {priority:"0001", group:'bolsa'}
     ),
-
-    inspiration: new undum.NonZeroIntegerQuality(
-        "Inspiration", {priority:"0001", group:'progress'}
-    ),
-    novice: new undum.OnOffQuality(
-        "Novice", {priority:"0002", group:'progress', onDisplay:"&#10003;"}
-    )
+	bebidaEner: new undum.OnOffQuality(
+		"Mostro™", {priority:"0003", group:'bolsa'}
+	)
 };
 
 // ---------------------------------------------------------------------------
@@ -472,18 +287,18 @@ undum.game.qualities = {
  * the end. It is an error to have a quality definition belong to a
  * non-existent group. */
 undum.game.qualityGroups = {
-    stats: new undum.QualityGroup(null, {priority:"0001"}),
-    progress: new undum.QualityGroup('Progress', {priority:"0002"})
+    bolsillo: new undum.QualityGroup('Bolsillo', {priority:"0002"}),
+    bolsa: new undum.QualityGroup('Bolsa', {priority:"0003"}),
+	oculto: new undum.QualityGroup(null,{priority:"0001"})
 };
 
 // ---------------------------------------------------------------------------
 /* This function gets run before the game begins. It is normally used
  * to configure the character at the start of play. */
 undum.game.init = function(character, system) {
-    character.qualities.skill = 12;
-    character.qualities.stamina = 12;
-    character.qualities.luck = 0;
-    character.qualities.novice = 1;
-    character.qualities.inspiration = 0;
-    system.setCharacterText("<p>You are starting on an exciting journey.</p>");
+	system.setQuality("mascarilla", false);
+    system.setQuality("dinero", 0);
+    system.setQuality("llaves", false);
+    system.setQuality("baguette" , false);
+    system.setQuality("bebidaEner" , false);
 };

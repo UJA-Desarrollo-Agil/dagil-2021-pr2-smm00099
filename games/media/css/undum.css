@@ -355,3 +355,9 @@ img.float_left {
 #menu {
     display: none;
 }
+.dialogo {
+	font-style: italic;
+	padding-left: 2em;
+	padding-top: 1.2em;
+	padding-bottom: 1.2em;
+}
