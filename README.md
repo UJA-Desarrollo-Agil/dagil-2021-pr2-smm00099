@@ -14,9 +14,9 @@ https://trello.com/b/nLdC3rth
 ### Inicio
 <img title="Inicio" src="https://raw.githubusercontent.com/UJA-Desarrollo-Agil/dagil-2021-pr2-smm00099/master/imagenesmarkdown/telegram.jpg">
 ### Mitad
-<img title="Mitad" src="https://raw.githubusercontent.com/UJA-Desarrollo-Agil/dagil-2021-pr2-smm00099/master/imagenesmarkdown/trellomid.png"
+<img title="Mitad" src="https://raw.githubusercontent.com/UJA-Desarrollo-Agil/dagil-2021-pr2-smm00099/master/imagenesmarkdown/trellomid.png">
 ### Final
-<img title="Mitad" src="https://raw.githubusercontent.com/UJA-Desarrollo-Agil/dagil-2021-pr2-smm00099/master/imagenesmarkdown/trellofin.png"
+<img title="Mitad" src="https://raw.githubusercontent.com/UJA-Desarrollo-Agil/dagil-2021-pr2-smm00099/master/imagenesmarkdown/trellofin.png">
 ## Capturas Telegram
 <img title="Telegram" src="https://raw.githubusercontent.com/UJA-Desarrollo-Agil/dagil-2021-pr2-smm00099/master/imagenesmarkdown/telegram.jpg">
 
